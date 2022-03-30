@@ -95,13 +95,9 @@
         let message;
         // 2,-1은 승리조건, -2,1은 패배조건, 점수표 참고
         if ([2, -1].includes(diff)) {
-          score += 1;
           myScore += 1;
-          computerScore -= 1;
           message = '승리';
         } else if ([-2, 1].includes(diff)) {
-          score -= 1;
-          myScore -= 1;
           computerScore += 1;
           message = '패배';
         } else {
@@ -121,7 +117,16 @@
           else if(computerScore === 3)
             $score.textContent = `패배`;
           else
+          {
+            gameCnt = 0;
+            myScore = 0;
+            computerScore = 0;
             $score.textContent = `승부가 나지 않았습니다.`;
+            setTimeout(() => {
+            clickable = true;
+            intervalId = setInterval(changeComputerHand, 50);
+          }, 1000);
+          }
         }
       }
     };
