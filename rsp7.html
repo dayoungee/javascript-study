@@ -1,0 +1,114 @@
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>가위바위보</title>
+  <style>
+    #computer {
+      width: 142px;
+      height: 200px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="computer"></div>
+  <div>
+    <button id="scissors" class="btn">가위</button>
+    <button id="rock" class="btn">바위</button>
+    <button id="paper" class="btn">보</button>
+  </div>
+  <div id="score">0</div>
+  <script>
+    const $computer = document.querySelector('#computer');
+    const $score = document.querySelector('#score');
+    const $rock = document.querySelector('#rock');
+    const $scissors = document.querySelector('#scissors');
+    const $paper = document.querySelector('#paper');
+    const IMG_URL = './rsp.png';
+
+    //객체 - 그룹화를 위해
+    const rspX = {
+      scissors: '0', // 가위
+      rock: '-220px', // 바위
+      paper: '-440px', // 보
+    };
+
+    // 백그라운드와 백그라운드사이즈는 한세트처럼 사용한다.
+    let computerChoice = 'scissors';
+    const changeComputerHand = () => {
+
+      if (computerChoice === 'scissors') {
+        computerChoice = 'rock';
+      } else if (computerChoice === 'rock') {
+        computerChoice = 'paper';
+      } else if (computerChoice === 'paper') {
+        computerChoice = 'scissors'
+      }
+      // rspX.computerCoice => computerCoice라는 키를 찾는 뜻임. 고로 저렇게 쓰면 안됨.
+      // 백그라운드와 백그라운드사이즈는 한세트처럼 사용한다.
+      $computer.style.background = `url(${IMG_URL}) ${rspX[computerChoice]} 0`;
+      $computer.style.backgroundSize = 'auto 200px';
+    }
+    // 셋인터벌 : 타이머와 비슷, 다만 인터벌은 주기적으로 함수를 호출해줌, 타이머는 단 한번.
+    /**
+     * 이렇게 타임아웃을 사용하여 인터벌의 효과를 줄 수 있겠지만, 비교적 간단한 인터벌에 낫지 않을까?
+     * 셋인터벌은 시간을 맞추려고 노력한다. 반면, 타임아웃은 시간이 정확하진 않음.
+     * const a = () =>{
+     * 
+     *  setTimeout(a, 100);
+     * }
+     * setTimeout(a, 100);
+    */
+    let intervalId = setInterval(changeComputerHand, 50);
+
+    const scoreTable = {
+      rock: 0,
+      scissors: 1,
+      paper: -1,
+    };
+
+    let clickable = true;
+    let score = 0;
+    const clickButton = () => {
+      if (clickable) {
+        clearInterval(intervalId);
+        clickable = false;
+        const myChoice = event.target.textContent === '바위'
+          ? 'rock'
+          : event.target.textContent === '가위'
+            ? 'scissors'
+            : 'paper';
+
+        const myScore = scoreTable[myChoice];
+        const computerScore = scoreTable[computerChoice];
+        const diff = myScore - computerScore;
+
+        let message;
+        // 2,-1은 승리조건, -2,1은 패배조건, 점수표 참고
+        if ([2, -1].includes(diff)) {
+          score+=1;
+          message = '승리';
+        } else if ([-2, 1].includes(diff)) {
+          score-=1;
+          message = '패배';
+        } else {
+          message = '무승부';
+        }
+        $score.textContent = `${message} 총: ${score}점`;
+        setTimeout(() => {
+          clickable = true;
+          intervalId = setInterval(changeComputerHand, 50);
+        }, 1000);
+      }
+    };
+    /**
+     * {} === {} false, [] ===[] false, 때문에 변수에 넣어서 사용하라 a = function(){}; b = a;
+    */
+    $rock.addEventListener('click', clickButton);
+    $scissors.addEventListener('click', clickButton);
+    $paper.addEventListener('click', clickButton);
+  </script>
+</body>
+
+</html>
