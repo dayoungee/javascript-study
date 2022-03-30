@@ -19,12 +19,16 @@
     <button id="paper" class="btn">보</button>
   </div>
   <div id="score">0</div>
+  <div id="myScore">0</div>
+  <div id="computerScore">0</div>
   <script>
     const $computer = document.querySelector('#computer');
     const $score = document.querySelector('#score');
     const $rock = document.querySelector('#rock');
     const $scissors = document.querySelector('#scissors');
     const $paper = document.querySelector('#paper');
+    const $myScore = document.querySelector('#myScore');
+    const $computerScore = document.querySelector('#computerScore');
     const IMG_URL = './rsp.png';
 
     //객체 - 그룹화를 위해
@@ -70,8 +74,12 @@
 
     let clickable = true;
     let score = 0;
+    let myScore = 0;
+    let computerScore = 0;
+    let gameCnt = 0;
     const clickButton = () => {
       if (clickable) {
+        gameCnt++;
         clearInterval(intervalId);
         clickable = false;
         const myChoice = event.target.textContent === '바위'
@@ -80,26 +88,41 @@
             ? 'scissors'
             : 'paper';
 
-        const myScore = scoreTable[myChoice];
-        const computerScore = scoreTable[computerChoice];
-        const diff = myScore - computerScore;
+        const my = scoreTable[myChoice];
+        const computer = scoreTable[computerChoice];
+        const diff = my - computer;
 
         let message;
         // 2,-1은 승리조건, -2,1은 패배조건, 점수표 참고
         if ([2, -1].includes(diff)) {
-          score+=1;
+          score += 1;
+          myScore += 1;
+          computerScore -= 1;
           message = '승리';
         } else if ([-2, 1].includes(diff)) {
-          score-=1;
+          score -= 1;
+          myScore -= 1;
+          computerScore += 1;
           message = '패배';
         } else {
           message = '무승부';
         }
-        $score.textContent = `${message} 총: ${score}점`;
-        setTimeout(() => {
-          clickable = true;
-          intervalId = setInterval(changeComputerHand, 50);
-        }, 1000);
+        $myScore.textContent = `${myScore}점`;
+        $computerScore.textContent = `${computerScore}점`;
+        if (gameCnt < 5) {
+          setTimeout(() => {
+            clickable = true;
+            intervalId = setInterval(changeComputerHand, 50);
+          }, 1000);
+        }
+        else {
+          if(myScore === 3)
+            $score.textContent = `승리!`;
+          else if(computerScore === 3)
+            $score.textContent = `패배`;
+          else
+            $score.textContent = `승부가 나지 않았습니다.`;
+        }
       }
     };
     /**
