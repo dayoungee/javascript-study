@@ -37,7 +37,7 @@
     const checkWinner = (target) => {
       const rowIndex = target.parentNode.rowIndex;
       const cellIndex = target.cellIndex;
-      
+
       // 세 칸 다 채워졌나?
       let hasWinner = false;
       // 가로줄 검사
@@ -74,9 +74,10 @@
       return hasWinner;
     };
 
+    let clickable = true;
     const callback = (event) => {
-      if (event.target.textContent !== '') { // 칸이 이미 채워져 있는가?
-        console.log('빈칸이 아닙니다.');
+      
+      if (event.target.textContent !== '' || clickable === false) { // 칸이 이미 채워져 있는가?
         return;
       }
       // 빈칸이면
@@ -91,13 +92,37 @@
       }
 
       // 승자가 없으면
-      const draw = rows.flat().every((cell)=> cell.textContent);
-  
+      const draw = rows.flat().every((cell) => cell.textContent);
+
       if (draw) {
         $result.textContent = `무승부`;
         return;
       }
       turn = turn === 'X' ? 'O' : 'X';
+
+      if (turn === 'X') {
+        clickable = false;
+        setTimeout(() => {
+          const emptyCells = rows.flat().filter((v) => !v.textContent);
+          const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+          randomCell.textContent = 'X';
+          const hasWinner = checkWinner(randomCell);
+          clickable = true;
+        },1000);
+        console.log(Math.floor(Math.random()*5+1));
+        // 승자가 있으면
+        if (hasWinner) {
+          $result.textContent = `${turn}님이 승리!`;
+          return;
+        }
+        // 승자가 없으면
+        const draw = rows.flat().every((cell) => cell.textContent);
+        if (draw) {
+          $result.textContent = '무승부';
+          return;
+        }
+        turn = turn === 'X' ? 'O' : 'X';
+      }
     };
 
     for (let i = 1; i <= 3; i++) {
